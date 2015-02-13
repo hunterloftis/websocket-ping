@@ -19,6 +19,7 @@ io.on('connect', function(socket){
 
 sockjs.on('connection', function(conn) {
   console.log('sockjs connection established');
+  conn.write(DYNO);
 });
 
 http.listen(PORT, function(err) {

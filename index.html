@@ -46,6 +46,10 @@
         sockStatus('disconnected');
       };
 
+      sock.onmessage = function(e) {
+        sockStatus('connected to ' + e.data);
+      }
+
       function status(label, id) {
         var el = document.getElementById(id);
         return function(status) {
