@@ -23,7 +23,9 @@
       var ioStatus = status('Socket.io', 'socketIoStatus');
       var sockStatus = status('SockJS', 'sockJsStatus');
       var socket = io();
-      var sock = new SockJS('/sockjs');
+      var sock = new SockJS('/sockjs', undefined, {
+        transports: [ 'xhr-streaming', 'xdr-streaming', 'iframe-eventsource', 'iframe-htmlfile', 'xhr-polling', 'xdr-polling' ]
+      });
 
       ioStatus('connecting');
       sockStatus('connecting');
