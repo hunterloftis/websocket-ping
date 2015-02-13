@@ -1,7 +1,13 @@
-# chat-example
+# Session Affinity Test
 
-This is the source code for a very simple chat example used for 
-the [Getting Started](http://socket.io/get-started/chat/) guide 
-of the Socket.IO website.
+Socket.io relies on sticky sessions for multiple-node support:
 
-Please refer to it to learn how to run this application.
+- http://socket.io/docs/using-multiple-nodes/
+
+The polling transports of SockJS (used by Meteor) also require sticky sessions:
+
+- http://stackoverflow.com/questions/22594942/sockjs-and-meteor-what-if-load-balancer-do-not-support-sticky-sessions
+
+With one dyno, you'll get a nice solid connection to both.
+As the number of dynos grows, the connections become less reliable
+as the chance of subsequent connections to the same dyno diminishes.
