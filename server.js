@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var sockjs = require('sockjs').createServer({ websocket: false });
 
 var PORT = process.env.PORT || 3000;
+var DYNO = process.env.DYNO || 'unnamed.dyno';
 
 sockjs.installHandlers(http, { prefix: '/sockjs' });
 
@@ -13,6 +14,7 @@ app.get('/', function(req, res){
 
 io.on('connect', function(socket){
   console.log('socket.io connection established');
+  socket.emit('dyno', { name: DYNO });
 });
 
 sockjs.on('connection', function(conn) {

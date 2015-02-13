@@ -35,7 +35,8 @@
         .on('error', onError)
         .on('disconnect', onDisconnect)
         .on('reconnect', onConnect)
-        .on('reconnect_failed', onDisconnect);
+        .on('reconnect_failed', onDisconnect)
+        .on('dyno', onDyno);
 
       sock.onopen = function() {
         sockStatus('connected');
@@ -54,6 +55,10 @@
 
       function onConnect() {
         ioStatus('connected');
+      }
+
+      function onDyno(data) {
+        ioStatus('connected to ' + data.name);
       }
 
       function onError(err) {
