@@ -16,11 +16,14 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+
     <script>
 
       var ioStatus = status('Socket.io', 'socketIoStatus');
       var sockStatus = status('SockJS', 'sockJsStatus');
       var socket = io();
+      var sock = new SockJS('/sockjs');
 
       ioStatus('connecting');
       sockStatus('connecting');
@@ -32,6 +35,14 @@
         .on('reconnect', onConnect)
         .on('reconnect_failed', onDisconnect);
 
+      sock.onopen = function() {
+        sockStatus('connected');
+      };
+
+      sock.onclose = function() {
+        sockStatus('disconnected');
+      };
+
       function status(label, id) {
         var el = document.getElementById(id);
         return function(status) {
@@ -40,7 +51,6 @@
       }
 
       function onConnect() {
-        console.log('connect');
         ioStatus('connected');
       }
 
@@ -49,7 +59,6 @@
       }
 
       function onDisconnect() {
-        console.log('disconnect');
         ioStatus('disconnected');
       }
 
