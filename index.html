@@ -34,7 +34,7 @@
       // Vanilla ws
       var wsStatus = status('WebSocket', 'wsStatus');
       var host = location.origin.replace(/^http/, 'ws')
-      //var ws = new WebSocket(host);
+      var ws = new WebSocket(host + '/vanilla');
 
       // Socket.io
       ioStatus('connecting');
@@ -53,9 +53,10 @@
       sock.onmessage = onSockMessage;
 
       // Vanilla ws
-      // wsStatus('connecting');
-      // ws.onopen = onWsConnected;
-      // ws.onclose = onWsDisconnected;
+      wsStatus('connecting');
+      ws.onopen = onWsConnected;
+      ws.onclose = onWsDisconnected;
+      ws.onmessage = onWsMessage;
 
       // Socket.io
 
@@ -112,6 +113,10 @@
         wsStatus('disconnected');
       }
 
+      function onWsMessage(e) {
+        wsStatus('connected to ' + e.data);
+      }
+      
       function wsPing() {
         console.log('WebSocket ping');
         ws.send('ping');
