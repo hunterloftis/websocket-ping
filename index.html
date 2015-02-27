@@ -13,6 +13,7 @@
     <div class='Status'>
       <p id='socketIoStatus'></p>
       <p id='sockJsStatus'></p>
+      <p id='wsStatus'></p>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -30,6 +31,11 @@
       var sockStatus = status('SockJS', 'sockJsStatus');
       var sock = new SockJS('/sockjs');
 
+      // Vanilla ws
+      var wsStatus = status('WebSocket', 'wsStatus');
+      var host = location.origin.replace(/^http/, 'ws')
+      //var ws = new WebSocket(host);
+
       // Socket.io
       ioStatus('connecting');
       sIo
@@ -45,6 +51,11 @@
       sock.onopen = onSockConnected;
       sock.onclose = onSockDisconnected;
       sock.onmessage = onSockMessage;
+
+      // Vanilla ws
+      // wsStatus('connecting');
+      // ws.onopen = onWsConnected;
+      // ws.onclose = onWsDisconnected;
 
       // Socket.io
 
@@ -88,6 +99,22 @@
       function sockPing() {
         console.log('SockJS ping');
         sock.send('ping');
+      }
+
+      // Vanilla ws
+
+      function onWsConnected() {
+        wsStatus('connected');
+        if (PING) setInterval(wsPing, PING);
+      }
+
+      function onWsDisconnected() {
+        wsStatus('disconnected');
+      }
+
+      function wsPing() {
+        console.log('WebSocket ping');
+        ws.send('ping');
       }
 
       // Util
