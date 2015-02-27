@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var sockjs = require('sockjs').createServer({ websocket: false });
+var sockjs = require('sockjs').createServer();
 
 var PORT = process.env.PORT || 3000;
 var DYNO = process.env.DYNO || 'unnamed.dyno';

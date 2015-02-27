@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Session Affinity Test</title>
+    <title>WebSocket Ping Test</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -20,35 +20,77 @@
 
     <script>
 
+      var PING = getParameterByName('ping');
+
+      // Socket.io
       var ioStatus = status('Socket.io', 'socketIoStatus');
+      var sIo = io();
+
+      // SockJS
       var sockStatus = status('SockJS', 'sockJsStatus');
-      var socket = io();
-      var sock = new SockJS('/sockjs', null, {
-        protocols_whitelist: [ 'xhr-polling', 'xdr-polling', 'iframe-xhr-polling', 'jsonp-polling' ]
-      });
+      var sock = new SockJS('/sockjs');
 
+      // Socket.io
       ioStatus('connecting');
+      sIo
+        .on('connect', onIoConnect)
+        .on('error', onIoError)
+        .on('disconnect', onIoDisconnect)
+        .on('reconnect', onIoConnect)
+        .on('reconnect_failed', onIoDisconnect)
+        .on('dyno', onIoDyno);
+
+      // SockJS
       sockStatus('connecting');
+      sock.onopen = onSockConnected;
+      sock.onclose = onSockDisconnected;
+      sock.onmessage = onSockMessage;
 
-      socket
-        .on('connect', onConnect)
-        .on('error', onError)
-        .on('disconnect', onDisconnect)
-        .on('reconnect', onConnect)
-        .on('reconnect_failed', onDisconnect)
-        .on('dyno', onDyno);
+      // Socket.io
 
-      sock.onopen = function() {
+      function onIoConnect() {
+        ioStatus('connected');
+        if (PING) setInterval(ioPing, PING);
+      }
+
+      function onIoDyno(data) {
+        ioStatus('connected to ' + data.name);
+      }
+
+      function onIoError(err) {
+        console.log('error:', err);
+      }
+
+      function onIoDisconnect() {
+        ioStatus('disconnected');
+      }
+
+      function ioPing() {
+        console.log('Socket.io ping');
+        sIo.emit('ping');
+      }
+
+      // SockJS
+
+      function onSockConnected() {
         sockStatus('connected');
-      };
+        if (PING) setInterval(sockPing, PING);
+      }
 
-      sock.onclose = function() {
+      function onSockDisconnected() {
         sockStatus('disconnected');
-      };
+      }
 
-      sock.onmessage = function(e) {
+      function onSockMessage(e) {
         sockStatus('connected to ' + e.data);
       }
+
+      function sockPing() {
+        console.log('SockJS ping');
+        sock.send('ping');
+      }
+
+      // Util
 
       function status(label, id) {
         var el = document.getElementById(id);
@@ -57,20 +99,11 @@
         }
       }
 
-      function onConnect() {
-        ioStatus('connected');
-      }
-
-      function onDyno(data) {
-        ioStatus('connected to ' + data.name);
-      }
-
-      function onError(err) {
-        console.log('error:', err);
-      }
-
-      function onDisconnect() {
-        ioStatus('disconnected');
+      function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
       }
 
     </script>
